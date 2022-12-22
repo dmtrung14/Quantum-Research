@@ -1,3 +1,4 @@
+using Plots
 function bit_majority_voting(bit)
     one = 0
     zero = 0
@@ -24,7 +25,7 @@ function monte_carlo_code_simulation(repetition_code_size, error_rate)
         for attempt_number in 1:repetition_code_size
             random_number_generator = rand()
             if random_number_generator < error_rate
-                 encoded_bit_after_noise = encoded_bit_after_noise*"1"
+                encoded_bit_after_noise = encoded_bit_after_noise*"1"
             else
                 encoded_bit_after_noise = encoded_bit_after_noise*"0"
             end
@@ -41,4 +42,8 @@ function monte_carlo_code_simulation(repetition_code_size, error_rate)
     end
     return correct_results/1000
 end
-println(monte_carlo_code_simulation(3,0.3))
+# plotting decoding error rate vs physical error rate
+x = range(0,1,100)
+y1 = 1 .- monte_carlo_code_simulation.(6, x)
+y2 = 1 .- monte_carlo_code_simulation.(4, x)
+display(plot(x, [y1 y2]))
