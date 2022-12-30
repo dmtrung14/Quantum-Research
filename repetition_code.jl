@@ -42,8 +42,12 @@ function monte_carlo_code_simulation(repetition_code_size, error_rate)
     end
     return correct_results/1000
 end
+
 # plotting decoding error rate vs physical error rate
-x = range(0,1,100)
-y1 = 1 .- monte_carlo_code_simulation.(6, x)
-y2 = 1 .- monte_carlo_code_simulation.(4, x)
-display(plot(x, [y1 y2]))
+function plotting_repetition_code(number_of_value_points)
+    x = range(0,1,number_of_value_points)
+    y1 = 1 .- monte_carlo_code_simulation.(6, x)
+    y2 = 1 .- monte_carlo_code_simulation.(4, x)
+    display(plot(x, [y1 y2]))
+end
+
