@@ -48,7 +48,9 @@ println(monte_carlo_code_simulation(3,0.3))
 
 end # module RepetitionCode
 
-x = range(0,1,45)
-# y1 = 1 .- monte_carlo_code_simulation.(6, x)
-y2 = 1 .- monte_carlo_code_simulation.(1, x)
-display(plot(x, y2))
+function plotting_repetition_code(number_of_value_points)
+    x = range(0,1,number_of_value_points)
+    y1 = 1 .- monte_carlo_code_simulation.(6, x)
+    y2 = 1 .- monte_carlo_code_simulation.(4, x)
+    display(plot(x, [y1 y2]))
+end
