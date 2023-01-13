@@ -1,4 +1,6 @@
 using Plots
+using BenchmarkTools
+##
 function bit_majority_voting(bit)
     one = 0
     zero = 0
@@ -17,9 +19,10 @@ function bit_majority_voting(bit)
         return "0"
     end
 end
+
 function monte_carlo_code_simulation(repetition_code_size, error_rate)
     correct_results = 0
-    for attempt_number in 1:1000
+    for attempt_number in 1:100000
         all_zeroes_encoded_bit = repeat("0", repetition_code_size)        
         encoded_bit_after_noise = ""
         for attempt_number in 1:repetition_code_size
@@ -40,14 +43,16 @@ function monte_carlo_code_simulation(repetition_code_size, error_rate)
         end
 
     end
-    return correct_results/1000
+    return correct_results/100000
 end
 
 # plotting decoding error rate vs physical error rate
 function plotting_repetition_code(number_of_value_points)
-    x = range(0,1,number_of_value_points)
+    x = range(0,0.3,number_of_value_points)
     y1 = 1 .- monte_carlo_code_simulation.(6, x)
     y2 = 1 .- monte_carlo_code_simulation.(4, x)
-    display(plot(x, [y1 y2]))
+    display(plot(x, [y1 y2 x]))
 end
 
+println(monte_carlo_code_simulation(4, 0.3))
+plotting_repetition_code(20)
