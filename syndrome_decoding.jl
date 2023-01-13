@@ -1,8 +1,8 @@
 function get_parity_check_matrix()
     print("n-k: ")
-    x = parse(Int64, readline())
+    x = parse(Int16, readline())
     print("n: ")
-    y = parse(Int64, readline())
+    y = parse(Int16, readline())
     s = zeros(Int8, x,y)
     for i in 1:x
         for j in 1:y
@@ -45,15 +45,21 @@ function decode_syndrome(x)
     return hashmap(calculate_syndrome(H,x))
 end
 
-H = get_parity_check_matrix()
-TOTAL_SAMPLES = parse(Int32, readline())
-noisy_code_word = readline()
-for sample in 1:TOTAL_SAMPLES
-    correct_answer =0 
-    syndrome = calculate_syndrome(H,noisy_code_word)
-    decoded_logical_value = decode_syndrome(syndrome)
-
-    if decode_logical_value_is_correct
-        correct_answer +=1
+# Syndrome Decoding Test
+function syndrome_decoding()
+    H = get_parity_check_matrix()
+    TOTAL_SAMPLES = parse(Int32, readline())
+    noisy_code_word = readline()
+    correct_code_word = readline()
+    correct_answer = 0 
+    for sample in 1:TOTAL_SAMPLES
+        
+        syndrome = calculate_syndrome(H,noisy_code_word)
+        decoded_logical_value = decode_syndrome(syndrome)[rand(1:length(decode_syndrome(syndrome)))]    
+        if decoded_logical_value == correct_code_word
+            correct_answer +=1
+        end
     end
+    return correct_answer / TOTAL_SAMPLES
 end
+
