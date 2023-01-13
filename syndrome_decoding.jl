@@ -17,12 +17,15 @@ function calculate_syndrome(H, x)
     for i in 1:m
         temp = 0
         for j in H[i,1:n]
-            print("$i : ")
-            println(typeof(x[i]))
-            # temp += parse(Int, x[i]) * j
+            if typeof(x[i]) == Char
+                temp += parse(Int, x[i]) * j
+            else
+                temp += x[i]*j
+            end
         end
         res[i] = temp
     end
+    println(res)
     return res
 end
 
