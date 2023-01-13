@@ -18,9 +18,9 @@ function calculate_syndrome(H, x)
         temp = 0
         for j in H[i,1:n]
             if typeof(x[i]) == Char
-                temp += parse(Int, x[i]) * j
+                temp ⊻= parse(Int, x[i]) * j
             else
-                temp ⊻= x[i]*j
+                temp ⊻= trunc(Int, x[i]*j)
             end
         end
         res[i] = temp
