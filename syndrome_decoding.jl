@@ -1,8 +1,4 @@
-function get_parity_check_matrix()
-    print("n-k: ")
-    x = parse(Int16, readline())
-    print("n: ")
-    y = parse(Int16, readline())
+function get_parity_check_matrix(x,y)
     s = zeros(Int8, x,y)
     for i in 1:x
         for j in 1:y
@@ -10,16 +6,20 @@ function get_parity_check_matrix()
             s[i,j] = parse(Int8, readline())
         end
     end
-
     return s
 end
 
 function calculate_syndrome(H, x)
-    res = zeros(n-k)
-    for i in 1:n-k
+    # H = m*n parity check matrix
+    m = size(H,1)
+    n = size(H,2)
+    res = zeros(m)
+    for i in 1:m
         temp = 0
-        for j in H[i,1:y]
-            temp += x[i]*j
+        for j in H[i,1:n]
+            print("$i : ")
+            println(typeof(x[i]))
+            # temp += parse(Int, x[i]) * j
         end
         res[i] = temp
     end
@@ -28,8 +28,9 @@ end
 
 function syndrome_key_map(H)
     hashmap = Dict()
+    n = size(H,1)
     for i in 1:2^n
-        t = digits(i, base =2, pad = trunc(Int, log2(i)))
+        t = digits(i, base =2, pad = n)
         if calculate_syndrome(H,t) not in hashmap
             hashmap[calculate_syndrome(H,t)] = zeros(0)
             push!(hashmap[calculate_syndrome(H,t)], i)
@@ -40,26 +41,24 @@ function syndrome_key_map(H)
     return hashmap
 end
 
-function decode_syndrome(x)
+function decode_syndrome(H,x)
     hashmap = syndrome_key_map(H)
     return hashmap(calculate_syndrome(H,x))
 end
 
 # Syndrome Decoding Test
 function syndrome_decoding()
-    H = get_parity_check_matrix()
+    H = get_parity_check_matrix(3,2)
     TOTAL_SAMPLES = parse(Int32, readline())
     noisy_code_word = readline()
     correct_code_word = readline()
     correct_answer = 0 
-    for sample in 1:TOTAL_SAMPLES
-        
+    for sample in 1:TOTAL_SAMPLES        
         syndrome = calculate_syndrome(H,noisy_code_word)
-        decoded_logical_value = decode_syndrome(syndrome)[rand(1:length(decode_syndrome(syndrome)))]    
+        decoded_logical_value = decode_syndrome(H, syndrome)[rand(1:length(decode_syndrome(H, syndrome)))]    
         if decoded_logical_value == correct_code_word
             correct_answer +=1
         end
     end
     return correct_answer / TOTAL_SAMPLES
 end
-
