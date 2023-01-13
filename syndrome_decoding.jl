@@ -1,5 +1,5 @@
 function get_parity_check_matrix()
-    print("Dim: ")
+    print("n-k: ")
     x = parse(Int64, readline())
     print("n: ")
     y = parse(Int64, readline())
@@ -26,7 +26,7 @@ function calculate_syndrome(H, x)
     return res
 end
 
-function generating_syndrome_map(H)
+function syndrome_key_map(H)
     hashmap = Dict()
     for i in 1:2^n
         t = digits(i, base =2, pad = trunc(Int, log2(i)))
@@ -40,21 +40,20 @@ function generating_syndrome_map(H)
     return hashmap
 end
 
-
-
 function decode_syndrome(x)
-    hashmap = generating_syndrome_map(H)
+    hashmap = syndrome_key_map(H)
     return hashmap(calculate_syndrome(H,x))
 end
 
-
-
 H = get_parity_check_matrix()
 TOTAL_SAMPLES = parse(Int32, readline())
+noisy_code_word = readline()
 for sample in 1:TOTAL_SAMPLES
+    correct_answer =0 
     syndrome = calculate_syndrome(H,noisy_code_word)
     decoded_logical_value = decode_syndrome(syndrome)
+
     if decode_logical_value_is_correct
-        
+        correct_answer +=1
     end
 end
