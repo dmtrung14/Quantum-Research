@@ -20,12 +20,11 @@ function calculate_syndrome(H, x)
             if typeof(x[i]) == Char
                 temp += parse(Int, x[i]) * j
             else
-                temp += x[i]*j
+                temp ⊻= x[i]*j
             end
         end
         res[i] = temp
     end
-    println(res)
     return res
 end
 
@@ -33,8 +32,8 @@ function syndrome_key_map(H)
     hashmap = Dict()
     n = size(H,1)
     for i in 1:2^n
-        t = digits(i, base =2, pad = n)
-        if calculate_syndrome(H,t) not in hashmap
+        t = digits(i, base =2, pad = n+1)
+        if calculate_syndrome(H,t) ∉ keys(hashmap)
             hashmap[calculate_syndrome(H,t)] = zeros(0)
             push!(hashmap[calculate_syndrome(H,t)], i)
         else 
@@ -44,12 +43,14 @@ function syndrome_key_map(H)
     return hashmap
 end
 
-function decode_syndrome(H,x)
+function decode_syndrome(H,s)
     hashmap = syndrome_key_map(H)
-    return hashmap(calculate_syndrome(H,x))
+    return hashmap[calculate_syndrome(H,s)]
+    # return an array
 end
 
 # Syndrome Decoding Test
+
 function syndrome_decoding()
     H = get_parity_check_matrix(3,2)
     TOTAL_SAMPLES = parse(Int32, readline())
@@ -59,7 +60,7 @@ function syndrome_decoding()
     for sample in 1:TOTAL_SAMPLES        
         syndrome = calculate_syndrome(H,noisy_code_word)
         decoded_logical_value = decode_syndrome(H, syndrome)[rand(1:length(decode_syndrome(H, syndrome)))]    
-        if decoded_logical_value == correct_code_word
+        if bitstring(decoded_logical_value) == correct_code_word
             correct_answer +=1
         end
     end
