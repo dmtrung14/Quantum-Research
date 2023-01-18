@@ -61,14 +61,8 @@ function decode_syndrome(H,s)
 end
 
 # Syndrome Decoding Test
-function syndrome_decoding()
+function syndrome_decoding(TOTAL_SAMPLES, noisy_code_word, correct_code_word)
     H = get_parity_check_matrix(2,3)
-    print("Enter total samples: ")
-    TOTAL_SAMPLES = parse(Int32, readline())
-    print("Enter noisy code word: ")
-    noisy_code_word = readline()
-    print("Enter correct codeword: ")
-    correct_code_word = readline()
     correct_answer = 0 
     for sample in 1:TOTAL_SAMPLES        
         syndrome = calculate_syndrome(H,noisy_code_word)
