@@ -1,0 +1,4 @@
+name = "BitflipGenerator"
+uuid = "4093ec38-b4b2-4be6-bb25-48b7d579dc0c"
+authors = ["dmtrung14 <trungdangminh14012004@gmail.com>"]
+version = "0.1.0"

@@ -43,7 +43,7 @@ function syndrome_key_map(H)
     for i in 1:2^n
         t = digits(i, base =2, pad = n+1)
         if calculate_syndrome(H,t) ∉ keys(hashmap)
-            hashmap[calculate_syndrome(H,t)] = zeros(0)
+            hashmap[calculate_syndrome(H,t)] = Int8[]
             push!(hashmap[calculate_syndrome(H,t)], i)
         else 
             push!(hashmap[calculate_syndrome(H,t)], i)
@@ -73,7 +73,7 @@ function syndrome_decoding()
     for sample in 1:TOTAL_SAMPLES        
         syndrome = calculate_syndrome(H,noisy_code_word)
         decoded_logical_value = string_xor(bitstring(decode_syndrome(H, syndrome)[rand(1:length(decode_syndrome(H, syndrome)))]), noisy_code_word)
-        println(decoded_logical_value)
+        # println(decoded_logical_value)
         if string(decoded_logical_value) == correct_code_word
             correct_answer +=1
         end
