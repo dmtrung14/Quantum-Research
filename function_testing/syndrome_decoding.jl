@@ -1,5 +1,8 @@
-function get_parity_check_matrix(x,y)
+function get_parity_check_matrix(x, source)
     s = zeros(Int8, x)
+    for i in source
+        push!(H, i)
+    end
     #Placeholder: for every rows in the matrix, enter a binary string with length y
     return s
 end
@@ -7,6 +10,7 @@ end
 function calculate_syndrome(H, x)
     m = size(H,1)
     res = 0
+    
     for i in 1:m
         res_string = H[i] & x
         res = res << 1 + count_ones(res_string)%2
