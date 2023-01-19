@@ -1,7 +1,31 @@
-function get_parity_check_matrix(x, source)
-    s = zeros(Int8, x)
+function flip_i_bit(i, string)
+    return string ⊻ 1 << (i-1)
+    # so we don't need bitstring() to perform the xor bitflipping
+    # return bitstring(string ⊻ 1 <<i)
+    # # flip from right to left
+end
+function bitflip_generator(SAMPLE_SIZE, length, error_rate, string)
+    #for any codeword, generate a number of bitflips(or not) with probability of p.
+    res = Int8[]
+    for sample in 1:SAMPLE_SIZE
+        codeword = string
+        for i in 1:length
+            p =rand()
+            if p < error_rate
+                codeword = flip_i_bit(i, codeword)
+                # codeword = parse(UInt, flip_i_bit(i, codeword) ; base=2)
+            end
+        end
+        push!(res, codeword)
+        #add the last length digit of bitstring to the result
+    end
+    
+    return res
+end
+function get_parity_check_matrix(columns, source)
+    s = Int8[]
     for i in source
-        push!(H, i)
+        push!(s, i)
     end
     #Placeholder: for every rows in the matrix, enter a binary string with length y
     return s
@@ -22,7 +46,7 @@ end
 function syndrome_key_map(H)
     hashmap = Dict()
     n = size(H,1)
-    for i in 1:2^n
+    for i in 0:2^n
         if calculate_syndrome(H,i) ∉ keys(hashmap)
             hashmap[calculate_syndrome(H,i)] = Int8[]
             push!(hashmap[calculate_syndrome(H,i)], i)
@@ -43,16 +67,17 @@ function decode_syndrome(H,s)
 end
 
 # Syndrome Decoding function
-function syndrome_decoding(TOTAL_SAMPLES, noisy_code_word, correct_code_word)
-    H = get_parity_check_matrix(2,3)
-    correct_answer = 0 
-    for sample in 1:TOTAL_SAMPLES        
-        syndrome = calculate_syndrome(H,noisy_code_word)
-        decoded_logical_value = decode_syndrome(H, syndrome)[1] ⊻ noisy_code_word
-        # println(decoded_logical_value)
-        if string(decoded_logical_value) == correct_code_word
-            correct_answer +=1
-        end
-    end
-    return correct_answer / TOTAL_SAMPLES
+function syndrome_decoding(H, noisy_code_word)         
+    syndrome = calculate_syndrome(H,noisy_code_word)
+    decoded_logical_value = decode_syndrome(H, syndrome)[1] ⊻ noisy_code_word
+    return decoded_logical_value
+end
+
+
+#Test
+matrix_list = [0b010, 0b101]
+H = get_parity_check_matrix(2, matrix_list)
+correct_codeword = 0b101
+for i in bitflip_generator(1000, 3, 0.2, correct_codeword)
+    println(bitstring(syndrome_decoding(H, i)))
 end
