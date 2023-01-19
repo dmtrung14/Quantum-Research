@@ -1,38 +1,20 @@
 module SyndromeDecoding
-    function string_xor(a,b)
-        res = zeros(Int8, 0)
-        n = length(b)
-        for i in 1:n
-            push!(res, parse(Int8,a[i]) ⊻ parse(Int8, b[i]))
+    function get_parity_check_matrix(x, source)
+        s = zeros(Int8, x)
+        for i in source
+            push!(H, i)
         end
-        return join(res)
-    end
-    function get_parity_check_matrix(x,y)
-        s = zeros(Int8, x,y)
-        for i in 1:x
-            for j in 1:y
-                print("($i, $j) = ")
-                s[i,j] = parse(Int8, readline())
-            end
-        end
+        #Placeholder: for every rows in the matrix, enter a binary string with length y
         return s
     end
 
     function calculate_syndrome(H, x)
-        # H = m*n parity check matrix
         m = size(H,1)
-        n = size(H,2)
-        res = zeros(m)
+        res = 0
+        
         for i in 1:m
-            temp = 0
-            for j in H[i,1:n]
-                if typeof(x[i]) == Char
-                    temp ⊻= parse(Int, x[i]) * j
-                else
-                    temp ⊻= trunc(Int, x[i]*j)
-                end
-            end
-            res[i] = temp
+            res_string = H[i] & x
+            res = res << 1 + count_ones(res_string)%2
         end
         return res
     end
@@ -42,12 +24,11 @@ module SyndromeDecoding
         hashmap = Dict()
         n = size(H,1)
         for i in 1:2^n
-            t = digits(i, base =2, pad = n+1)
-            if calculate_syndrome(H,t) ∉ keys(hashmap)
-                hashmap[calculate_syndrome(H,t)] = zeros(0)
-                push!(hashmap[calculate_syndrome(H,t)], i)
+            if calculate_syndrome(H,i) ∉ keys(hashmap)
+                hashmap[calculate_syndrome(H,i)] = Int8[]
+                push!(hashmap[calculate_syndrome(H,i)], i)
             else 
-                push!(hashmap[calculate_syndrome(H,t)], i)
+                push!(hashmap[calculate_syndrome(H,i)], i)
             end
         end
         return hashmap
@@ -57,28 +38,24 @@ module SyndromeDecoding
     # Return an Array of all possible errors
     function decode_syndrome(H,s)
         hashmap = syndrome_key_map(H)
+        hashmap[s] = sort(hashmap[s], by=count_ones)
         return hashmap[s]
         # return an array
     end
 
-    # Syndrome Decoding Test
-    function syndrome_decoding()
+    # Syndrome Decoding function
+    function syndrome_decoding(TOTAL_SAMPLES, noisy_code_word, correct_code_word)
         H = get_parity_check_matrix(2,3)
-        print("Enter total samples: ")
-        TOTAL_SAMPLES = parse(Int32, readline())
-        print("Enter noisy code word: ")
-        noisy_code_word = readline()
-        print("Enter correct codeword: ")
-        correct_code_word = readline()
         correct_answer = 0 
         for sample in 1:TOTAL_SAMPLES        
             syndrome = calculate_syndrome(H,noisy_code_word)
-            decoded_logical_value = string_xor(bitstring(decode_syndrome(H, syndrome)[rand(1:length(decode_syndrome(H, syndrome)))]), noisy_code_word)
-            println(decoded_logical_value)
+            decoded_logical_value = decode_syndrome(H, syndrome)[1] ⊻ noisy_code_word
+            # println(decoded_logical_value)
             if string(decoded_logical_value) == correct_code_word
                 correct_answer +=1
             end
         end
         return correct_answer / TOTAL_SAMPLES
     end
+
 end # module SyndromeDecoding
