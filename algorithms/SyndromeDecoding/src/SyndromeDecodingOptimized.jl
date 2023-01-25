@@ -1,8 +1,18 @@
+using Plots
 function flip_i_bit(i, string)
     return string ⊻ 1 << (i-1)
     # so we don't need bitstring() to perform the xor bitflipping
     # return bitstring(string ⊻ 1 <<i)
     # # flip from right to left
+end
+function error_rate_without_correction(SAMPLE_SIZE, length, error_rate, string)
+    error = 0
+    for i in bitflip_generator(SAMPLE_SIZE, length, error_rate, string)
+        if i != string
+            error += 1
+        end
+    end
+    return error/SAMPLE_SIZE
 end
 function bitflip_generator(SAMPLE_SIZE, length, error_rate, string)
     #for any codeword, generate a number of bitflips(or not) with probability of p.
@@ -21,14 +31,6 @@ function bitflip_generator(SAMPLE_SIZE, length, error_rate, string)
     end
     
     return res
-end
-function get_parity_check_matrix(columns, source)
-    s = Int8[]
-    for i in source
-        push!(s, i)
-    end
-    #Placeholder: for every rows in the matrix, enter a binary string with length y
-    return s
 end
 
 function calculate_syndrome(H, x)
@@ -75,9 +77,23 @@ end
 
 
 #Test
-matrix_list = [0b010, 0b101]
-H = get_parity_check_matrix(2, matrix_list)
-correct_codeword = 0b101
-for i in bitflip_generator(1000, 3, 0.2, correct_codeword)
-    println(bitstring(syndrome_decoding(H, i)))
+function monte_carlo_code_simulation(x)
+    H = [0b110, 0b011]
+    correct_codeword = 0b000
+    correct = 0
+    length = 100000
+    for i in bitflip_generator(length, 3, x, correct_codeword)
+        if syndrome_decoding(H,i) == correct_codeword
+            correct +=1
+        end
+    end
+    return correct/ length
+end
+
+#x = physical error rates, y: x= y ; simulated error_rate without correction; simulated logical error rate
+function plotting_repetition_code(number_of_value_points)
+    x = range(0,0.2,number_of_value_points)
+    y1 = 1 .- monte_carlo_code_simulation.(x)
+    z = error_rate_without_correction.(100000, 3, x, 0b000)
+    display(plot(x, [y1 x z]))
 end
